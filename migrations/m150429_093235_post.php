@@ -28,6 +28,8 @@ class m150429_093235_post extends Migration
      */
     public function safeDown()
     {
+        $this->dropTable('post');
+
         echo "m150429_093235_post reverted.\n";
 
         return true;
