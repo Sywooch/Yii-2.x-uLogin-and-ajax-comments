@@ -1,7 +1,21 @@
 <?php
+
+namespace app\controllers;
+
+use yii\web\Controller;
+
 /**
- * Created by PhpStorm.
- * User: sergey
- * Date: 29.04.15
- * Time: 11:29
- */ 
+ * Class IndexController
+ *
+ * @package app\controllers
+ */
+class IndexController extends Controller
+{
+    /**
+     * @return string
+     */
+    public function actionIndex()
+    {
+        return $this->render('index');
+    }
+}
