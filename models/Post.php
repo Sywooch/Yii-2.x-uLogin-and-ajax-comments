@@ -8,6 +8,13 @@ use app\models\_extend\AbstractActiveRecord;
  * Class Post
  *
  * @package app\models
+ * @property int       $id
+ * @property string    $title
+ * @property string    $content
+ * @property int       $authorID
+ *
+ * @property User      $author
+ * @property Comment[] $comments
  */
 class Post extends AbstractActiveRecord
 {
@@ -24,7 +31,9 @@ class Post extends AbstractActiveRecord
      */
     public function rules()
     {
-        return [];
+        return [
+            [['title', 'content', 'authorID'], 'required']
+        ];
     }
 
     /**
@@ -32,10 +41,31 @@ class Post extends AbstractActiveRecord
      */
     public function attributeLabels()
     {
-        return [];
+        return [
+            'title' => 'Title',
+            'content' => 'Content',
+            'authorID' => 'Author ID',
+            'author' => 'Author',
+        ];
     }
 
     ### relations
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAuthor()
+    {
+        return $this->hasOne(User::className(), ['id' => 'authorID']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getComments()
+    {
+        return $this->hasMany(Comment::className(), ['postID' => 'id']);
+    }
 
     ### functions
 }

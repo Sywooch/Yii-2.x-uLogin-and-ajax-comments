@@ -3,111 +3,70 @@
 namespace app\models;
 
 use app\models\_extend\AbstractActiveRecord;
-use yii\web\IdentityInterface;
 
 /**
  * Class User
  *
  * @package app\models
+ *
+ * @property int       $id
+ * @property string    $username
+ * @property string    $password
+ * @property string    $email
+ *
+ * @property Comment[] $comments
+ * @property Post[]    $posts
  */
-class User extends AbstractActiveRecord implements IdentityInterface
+class User extends AbstractActiveRecord
 {
-    public $id;
-    public $username;
-    public $password;
-    public $authKey;
-    public $accessToken;
-
-    private static $users = [
-        '100' => [
-            'id' => '100',
-            'username' => 'admin',
-            'password' => 'admin',
-            'authKey' => 'test100key',
-            'accessToken' => '100-token',
-        ],
-        '101' => [
-            'id' => '101',
-            'username' => 'demo',
-            'password' => 'demo',
-            'authKey' => 'test101key',
-            'accessToken' => '101-token',
-        ],
-    ];
-
     /**
-     * @inheritdoc
+     * @return string
      */
-    public static function findIdentity($id)
+    public static function tableName()
     {
-        return isset(self::$users[$id]) ? new static(self::$users[$id]) : null;
+        return 'user';
     }
 
     /**
-     * @inheritdoc
+     * @return array
      */
-    public static function findIdentityByAccessToken($token, $type = null)
+    public function rules()
     {
-        foreach (self::$users as $user) {
-            if ($user['accessToken'] === $token) {
-                return new static($user);
-            }
-        }
-
-        return null;
+        return [
+            [['password', 'email'], 'required'],
+            ['username', 'safe']
+        ];
     }
 
     /**
-     * Finds user by username
-     *
-     * @param  string $username
-     *
-     * @return static|null
+     * @return array
      */
-    public static function findByUsername($username)
+    public function attributeLabels()
     {
-        foreach (self::$users as $user) {
-            if (strcasecmp($user['username'], $username) === 0) {
-                return new static($user);
-            }
-        }
+        return [
+            'username' => 'Login',
+            'email' => 'Email',
+            'password' => 'Password'
+        ];
+    }
 
-        return null;
+    ### relations
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPosts()
+    {
+        return $this->hasMany(Post::className(), ['authorID' => 'id']);
     }
 
     /**
-     * @inheritdoc
+     * @return \yii\db\ActiveQuery
      */
-    public function getId()
+    public function getComments()
     {
-        return $this->id;
+        return $this->hasMany(Comment::className(), ['authorID' => 'id']);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getAuthKey()
-    {
-        return $this->authKey;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function validateAuthKey($authKey)
-    {
-        return $this->authKey === $authKey;
-    }
-
-    /**
-     * Validates password
-     *
-     * @param  string $password password to validate
-     *
-     * @return boolean if password provided is valid for current user
-     */
-    public function validatePassword($password)
-    {
-        return $this->password === $password;
-    }
+    ### functions
 }
