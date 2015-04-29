@@ -23,6 +23,7 @@ AppAsset::register($this);
         <?= Html::csrfMetaTags() ?>
         <title><?= Html::encode($this->title) ?></title>
         <?php $this->head() ?>
+        <script src="//ulogin.ru/js/ulogin.js"></script>
     </head>
 
     <body>
@@ -36,6 +37,7 @@ AppAsset::register($this);
         echo Nav::widget([
             'options' => ['class' => 'navbar-nav navbar-right'],
             'items' => [
+                ['label' => 'Posts', 'url' => ['/post']],
                 ['label' => 'About', 'url' => ['/about']],
                 \Yii::$app->getUser()->getIsGuest() ?
                     ['label' => 'Login', 'url' => ['/auth/login']] :

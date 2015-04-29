@@ -12,20 +12,19 @@ $config = [
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
-        'user' => [
-            'identityClass' => 'app\models\User',
-            'enableAutoLogin' => true,
-        ],
         'errorHandler' => [
-            'errorAction' => 'site/error',
+            'errorAction' => 'error/index',
         ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
-            'rules' => [
-                '/' => 'index/index',
-                '/about' => 'about/index'
-            ]
+            'rules' => require(__DIR__ . '/_routes.php')
+        ],
+        'user' => [
+            'class' => 'app\components\UserExtended',
+            'identityClass' => 'app\components\UserIdentity',
+            'enableAutoLogin' => true,
+            'loginUrl' => ['auth/login']
         ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',

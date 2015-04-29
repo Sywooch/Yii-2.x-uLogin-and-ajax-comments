@@ -2,7 +2,12 @@
 
 namespace app\controllers;
 
+use app\components\UserIdentity;
 use app\models\_formLogin;
+use app\models\User;
+use app\models\UserSocial;
+use yii\base\InvalidParamException;
+use yii\helpers\Json;
 use yii\web\Controller;
 
 /**
@@ -17,17 +22,55 @@ class AuthController extends Controller
      */
     public function actionLogin()
     {
-        if (!\Yii::$app->getUser()->getIsGuest()) {
-            return $this->goHome();
+        $aReturn = [
+            'error' => false
+        ];
+
+        if (\Yii::$app->getRequest()->getIsAjax()) {
+            try {
+                $aData = \Yii::$app->getRequest()->post();
+                $mUserSocial = $this->getUserSocial($aData);
+                $mUser = $mUserSocial->user;
+
+                if (!$mUser) {
+                    $mUser = new User();
+                    $mUser->fname = $aData['first_name'];
+                    $mUser->sname = $aData['last_name'];
+
+                    if (!$mUser->save()) {
+                        throw new InvalidParamException('Cannot save new user model.');
+                    }
+                }
+
+                \Yii::$app->getUser()->login(UserIdentity::findIdentity($mUser->id), 3600 * 24 * 30);
+
+            } catch (\Exception $oException) {
+                $aReturn['error'] = $oException->getMessage();
+            }
         }
 
-        $fLogin = new _formLogin();
+        return Json::encode($aReturn);
+    }
 
-        if ($fLogin->load(\Yii::$app->getRequest()->post()) && $fLogin->login()) {
-            return $this->goBack();
+    /**
+     * @param array $aData
+     *
+     * @return UserSocial
+     */
+    private function getUserSocial($aData)
+    {
+        $mUserSocial = UserSocial::findOne(['uid' => $aData['uid'], 'network' => $aData['network']]);
+
+        if (!$mUserSocial) {
+            $mUserSocial = new UserSocial();
+            $mUserSocial->attributes = $aData;
+
+            if (!$mUserSocial->save()) {
+                throw new InvalidParamException('Cannot save userSocial model.');
+            }
         }
 
-        return $this->render('login', ['fLogin' => $fLogin]);
+        return $mUserSocial;
     }
 
     /**
@@ -39,4 +82,5 @@ class AuthController extends Controller
 
         return $this->goHome();
     }
+
 }

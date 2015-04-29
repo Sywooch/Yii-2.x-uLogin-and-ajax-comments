@@ -13,6 +13,8 @@ use yii\base\NotSupportedException;
  */
 class UserIdentity extends User implements IdentityInterface
 {
+    public $username;
+
     /**
      * @param int|string $id
      *
@@ -65,5 +67,17 @@ class UserIdentity extends User implements IdentityInterface
     public function validateAuthKey($sAuthKey)
     {
         return $this->getAuthKey() === $sAuthKey;
+    }
+
+    /**
+     * @param string $sUsername
+     *
+     * @return $this
+     */
+    public function setUsername($sUsername)
+    {
+        $this->username = $sUsername;
+
+        return $this;
     }
 }

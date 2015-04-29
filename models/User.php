@@ -9,13 +9,13 @@ use app\models\_extend\AbstractActiveRecord;
  *
  * @package app\models
  *
- * @property int       $id
- * @property string    $username
- * @property string    $password
- * @property string    $email
+ * @property int          $id
+ * @property string       $fname        First name
+ * @property string       $sname        Second\Last name
  *
- * @property Comment[] $comments
- * @property Post[]    $posts
+ * @property Comment[]    $comments
+ * @property Post[]       $posts
+ * @property UserSocial[] $userSocials
  */
 class User extends AbstractActiveRecord
 {
@@ -33,8 +33,7 @@ class User extends AbstractActiveRecord
     public function rules()
     {
         return [
-            [['password', 'email'], 'required'],
-            ['username', 'safe']
+            [['fname', 'sname'], 'safe']
         ];
     }
 
@@ -44,9 +43,8 @@ class User extends AbstractActiveRecord
     public function attributeLabels()
     {
         return [
-            'username' => 'Login',
-            'email' => 'Email',
-            'password' => 'Password'
+            'fname' => 'First name',
+            'sname' => 'Second name'
         ];
     }
 
@@ -68,5 +66,21 @@ class User extends AbstractActiveRecord
         return $this->hasMany(Comment::className(), ['authorID' => 'id']);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUserSocials()
+    {
+        return $this->hasMany(UserSocial::className(), ['userID' => 'id']);
+    }
+
     ### functions
+
+    /**
+     * @return string|null
+     */
+    public function getName()
+    {
+        return $this->fname . ' ' . $this->sname;
+    }
 }
