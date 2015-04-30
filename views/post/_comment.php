@@ -14,7 +14,7 @@ $mCommentChild = new Comment();
 
 ?>
 
-<li class="media">
+<li class="media" data-comment="<?= $mComment->id; ?>">
     <div class="media-left">
         <a href="#">
             <img class="media-object" src="http://placehold.it/50x50">
@@ -36,13 +36,16 @@ $mCommentChild = new Comment();
                 <?php endif; ?>
             </div>
 
-            <span><?= $mComment->id; ?> <?= $mComment->author->getName(); ?> <small class="text-muted"><?= \Yii::$app->getFormatter()->asDatetime($mComment->timeCreate); ?></small></span>
+            <span><?= $mComment->id; ?> <?= $mComment->author->getName(); ?>
+                <small class="text-muted"><?= \Yii::$app->getFormatter()->asDatetime($mComment->timeCreate); ?></small></span>
         </h4>
 
         <p><?= $mComment->content; ?></p>
 
-        <?php if ($mComment->childComments): ?>
-            <?= $this->render('_commentList', ['aComment' => $mComment->childComments]); ?>
+        <?php $aChildComment = $mComment->getChildComments()->limit(\Yii::$app->params['commentsCount'])->addOrderBy('timeCreate ASC')->all(); ?>
+
+        <?php if ($aChildComment): ?>
+            <?= $this->render('_commentList', ['aComment' => $aChildComment]); ?>
         <?php endif; ?>
 
         <?php if (!$oUser->isGuest && $mComment->canComment()) : ?>

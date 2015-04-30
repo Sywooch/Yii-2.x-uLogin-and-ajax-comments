@@ -119,6 +119,7 @@ class Comment extends AbstractActiveRecord
         return $this->hasOne(Comment::className(), ['id' => 'parentID']);
     }
 
+
     ### functions
 
     public function isAuthor($userID)
@@ -148,5 +149,32 @@ class Comment extends AbstractActiveRecord
     public function canComment()
     {
         return ($this->level < 3);
+    }
+
+    /**
+     * @return int|string
+     */
+    public function hasNext()
+    {
+        return $this->nextCommentsQuery()->count();
+    }
+
+    /**
+     * @return null|Comment[]
+     */
+    public function getNextComments()
+    {
+        return $this->nextCommentsQuery()->limit(\Yii::$app->params['commentsCount'])->all();
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function nextCommentsQuery()
+    {
+
+        return Comment::find()
+            ->where('timeCreate > :timeCreate AND parentID = :parentID', ['timeCreate' => $this->timeCreate, 'parentID' => $this->parentID])
+            ->orderBy('timeCreate ASC');
     }
 }

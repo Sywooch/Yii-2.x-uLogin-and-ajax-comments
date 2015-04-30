@@ -96,4 +96,26 @@ $this->params['breadcrumbs'][] = $mPost->title;
                 }
             });
     }
+
+    function showMore(iCommentID) {
+        var oLi = $('[data-comment="' + iCommentID + '"]');
+
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            data: {iLastCommentID: iCommentID},
+            url: '/post/get-comments',
+            success: function (aData) {
+                console.log(oLi);
+                console.log(oLi.closest('ul.media-list'));
+                oLi.closest('ul.media-list').find('[data-action="show-more"]').remove();
+                oLi.append(aData.sHtml);
+
+            }
+        });
+    }
+
+    function removeShowMoreButton() {
+
+    }
 </script>
