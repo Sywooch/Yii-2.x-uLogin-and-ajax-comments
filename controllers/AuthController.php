@@ -18,6 +18,7 @@ use yii\web\Controller;
 class AuthController extends Controller
 {
     public $layout = false;
+
     /**
      * @return string|\yii\web\Response
      */
@@ -38,6 +39,12 @@ class AuthController extends Controller
 
                     if (!$mUser->save()) {
                         throw new InvalidParamException('Cannot save new user model.');
+                    }
+
+                    $mUserSocial->userID = $mUser->id;
+                    
+                    if (!$mUserSocial->save()) {
+                        throw new InvalidParamException('Cannot update user social entry.');
                     }
                 }
 

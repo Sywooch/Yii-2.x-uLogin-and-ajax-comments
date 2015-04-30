@@ -37,7 +37,7 @@ $this->params['breadcrumbs'][] = $mPost->title;
 
             <div class="panel-body">
 
-                <?php Pjax::begin(['id' => 'some123']); ?>
+                <?php Pjax::begin(['id' => 'comments']); ?>
 
                 <ul class="media-list" data-type="comment" data-id="123">
                     <?php foreach ($aComment as $mComment) : ?>
@@ -72,6 +72,10 @@ $this->params['breadcrumbs'][] = $mPost->title;
     //    });
     //    $(document).trigger('custom1');
 
+    function toggleCommentDialog(iCommentID) {
+        $('[data-id="comment-' + iCommentID + '"]').toggleClass('hidden');
+    }
+
     function preview(token) {
         $.getJSON("//ulogin.ru/token.php?host=" +
             encodeURIComponent(location.toString()) + "&token=" + token + "&callback=?",
@@ -85,7 +89,7 @@ $this->params['breadcrumbs'][] = $mPost->title;
                             url: '/auth/login',
                             data: data,
                             success: function (aData) {
-                                console.log(aData);
+                                $.pjax.reload({container: "#comments"});
 
                                 if (aData.isAuth == 1) {
                                     updateNavigation(aData.sNavigation);
@@ -96,8 +100,4 @@ $this->params['breadcrumbs'][] = $mPost->title;
                 }
             });
     }
-
-    $(document).ready(function () {
-
-    });
 </script>

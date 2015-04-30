@@ -29,8 +29,8 @@ use yii\helpers\Html;
 
                 <?php endif; ?>
 
-                <?php if (true): ?>
-                    <a class="btn btn-xs btn-success " href="/">Comment</a>
+                <?php if (!\Yii::$app->getUser()->getIsGuest()) : ?>
+                    <a class="btn btn-xs btn-success" onclick="toggleCommentDialog('<?= $mComment->id; ?>');return false;" href="/">Comment</a>
                 <?php endif; ?>
             </div>
 
@@ -46,19 +46,18 @@ use yii\helpers\Html;
             </ul>
         <?php endif; ?>
 
-        <div>
-            <?php $oForm = ActiveForm::begin(['options' => ['data-pjax' => 1]]); ?>
-            <?php $mCommentChild = new Comment(); ?>
+        <?php if (!\Yii::$app->getUser()->getIsGuest()) : ?>
+            <div class="hidden" data-id="comment-<?= $mComment->id; ?>">
+                <?php $oForm = ActiveForm::begin(['options' => ['data-pjax' => 1]]); ?>
+                <?php $mCommentChild = new Comment(); ?>
 
-            <?= $oForm->field($mCommentChild, 'content')->textarea(); ?>
-            <?= $oForm->field($mCommentChild, 'parentID')->hiddenInput(['value' => $mComment->id])->label(false); ?>
+                <?= $oForm->field($mCommentChild, 'content')->textarea(); ?>
+                <?= $oForm->field($mCommentChild, 'parentID')->hiddenInput(['value' => $mComment->id])->label(false); ?>
 
-            <?= Html::submitButton('Add', ['class' => 'btn btn-sm btn-primary center-block']); ?>
+                <?= Html::submitButton('Add', ['class' => 'btn btn-sm btn-primary center-block']); ?>
 
-            <?php ActiveForm::end(); ?>
-        </div>
-
-
+                <?php ActiveForm::end(); ?>
+            </div>
+        <?php endif; ?>
     </div>
 </li>
-

@@ -47,6 +47,7 @@ AppAsset::register($this);
                         url: '/auth/logout',
                         success: function (aData) {
                             updateNavigation(aData.sNavigation);
+                            $.pjax.reload({container: "#comments"});
                         }
                     })
                 })

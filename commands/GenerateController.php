@@ -23,9 +23,8 @@ class GenerateController extends Controller
     {
         for ($i = 0; $i < 5; $i++) {
             $mUser = new User();
-            $mUser->username = 'user' . $i;
-            $mUser->password = \Yii::$app->getSecurity()->generatePasswordHash('user1');
-            $mUser->email = $mUser->username . '@example.ru';
+            $mUser->fname = 'firsname' . $i;
+            $mUser->sname = 'secondname' . $i;
 
             if (!$mUser->save()) {
                 throw new InvalidParamException('Cannot save new generated user.');
