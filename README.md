@@ -7,7 +7,7 @@ Installation
 php yii generate/users
 php yii generate/posts
 ~~~
-3. Got to localhost/post and enter any post page.
+3. Go to http://localhost/post and enter any post page (http://localhost/post/<postID:\d+>).
 4. Play with comments. 
 
 WBR
