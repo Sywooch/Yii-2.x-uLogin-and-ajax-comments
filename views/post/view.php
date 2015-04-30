@@ -15,6 +15,8 @@ $this->params['breadcrumbs'][] = 'Post';
 $this->params['breadcrumbs'][] = 'View';
 $this->params['breadcrumbs'][] = $mPost->title;
 
+$oUser = \Yii::$app->getUser();
+
 ?>
 
 <div class="row">
@@ -36,12 +38,10 @@ $this->params['breadcrumbs'][] = $mPost->title;
             </div>
 
             <div class="panel-body">
-
                 <?php Pjax::begin(['id' => 'comments']); ?>
-
                 <?= $this->render('_commentList', ['aComment' => $aComment]); ?>
 
-                <?php if (\Yii::$app->getUser()->getIsGuest()): ?>
+                <?php if ($oUser->isGuest): ?>
                     <a href="#" data-action="uLogin" id="<?= \Yii::$app->getSecurity()->generateRandomString(5); ?>"><img src="https://ulogin.ru/img/button.png" width="187" height="30" alt="МультиВход"/></a>
                 <?php else: ?>
                     <?php $oFormComment = ActiveForm::begin(['options' => ['data-pjax' => 1]]); ?>
@@ -104,21 +104,13 @@ $this->params['breadcrumbs'][] = $mPost->title;
             type: 'POST',
             dataType: 'json',
             data: {
-                action: 'showMore',
+                sAction: 'showMore',
                 iLastCommentID: iCommentID
             },
-            //url: '/post/get-comments',
             success: function (aData) {
-                console.log(oLi);
-                console.log(oLi.closest('ul.media-list'));
                 oLi.closest('ul.media-list').find('[data-action="show-more"]').remove();
                 oLi.append(aData.sHtml);
-
             }
         });
-    }
-
-    function removeShowMoreButton() {
-
     }
 </script>

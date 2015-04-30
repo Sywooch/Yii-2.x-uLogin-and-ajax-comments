@@ -36,28 +36,30 @@ class PostController extends Controller
         $mPost = Post::findOne($id);
         $oUser = \Yii::$app->getUser();
 
-        if (!$oUser->isGuest && \Yii::$app->getRequest()->getIsPost()) {
-            $mComment = new Comment();
-            $mComment->postID = $id;
-            $mComment->authorID = \Yii::$app->getUser()->getID();
-            $mComment->timeCreate = time();
+        if (\Yii::$app->getRequest()->getIsPost()) {
+            if (!$oUser->isGuest) {
+                $mComment = new Comment();
+                $mComment->postID = $id;
+                $mComment->authorID = \Yii::$app->getUser()->getID();
+                $mComment->timeCreate = time();
 
-            if ($mComment->load(\Yii::$app->getRequest()->post())) {
-                $mComment->save();
-            }
+                if ($mComment->load(\Yii::$app->getRequest()->post())) {
+                    $mComment->save();
+                }
 
-            $iCommentID = \Yii::$app->getRequest()->post('commentID');
+                $iCommentID = \Yii::$app->getRequest()->post('commentID');
 
-            if ($iCommentID) {
-                $mComment = Comment::findOne(['authorID' => $oUser->getID(), 'id' => $iCommentID]);
-                /** @var Comment $mComment */
+                if ($iCommentID) {
+                    $mComment = Comment::findOne(['authorID' => $oUser->getID(), 'id' => $iCommentID]);
+                    /** @var Comment $mComment */
 
-                if ($mComment) {
-                    $mComment->delete();
+                    if ($mComment) {
+                        $mComment->delete();
+                    }
                 }
             }
 
-            if (\Yii::$app->getRequest()->post('action') == 'showMore'){
+            if (\Yii::$app->getRequest()->post('sAction') == 'showMore') {
                 $this->layout = false;
                 $mComment = Comment::findOne([\Yii::$app->getRequest()->post('iLastCommentID')]);
                 /** @var Comment $mComment */
