@@ -9,14 +9,15 @@ use app\models\_extend\AbstractActiveRecord;
  *
  * @package app\models
  *
- * @property int    $id
- * @property int    $postID
- * @property int    $authorID
- * @property string $content
- * @property int    $timeCreate
+ * @property int       $id
+ * @property int       $postID
+ * @property int       $authorID
+ * @property string    $content
+ * @property int       $timeCreate
  *
- * @property Post   $post
- * @property User   $author
+ * @property Post      $post
+ * @property User      $author
+ * @property Comment[] $childComments
  *
  */
 class Comment extends AbstractActiveRecord
@@ -35,6 +36,7 @@ class Comment extends AbstractActiveRecord
     public function rules()
     {
         return [
+            ['parentID', 'safe'],
             [['postID', 'authorID', 'content', 'timeCreate'], 'required']
         ];
     }
@@ -52,6 +54,20 @@ class Comment extends AbstractActiveRecord
             'content' => 'Content',
             'timeCreate' => 'Time create'
         ];
+    }
+
+    /**
+     * @return bool|void
+     */
+    public function beforeDelete()
+    {
+        if ($this->childComments) {
+            foreach ($this->childComments as $mComment) {
+                $mComment->delete();
+            }
+        }
+
+        return parent::beforeDelete();
     }
 
     ### relations
@@ -72,5 +88,26 @@ class Comment extends AbstractActiveRecord
         return $this->hasOne(User::className(), ['id' => 'authorID']);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getChildComments()
+    {
+        return $this->hasMany(Comment::className(), ['parentID' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getParentComment()
+    {
+        return $this->hasOne(Comment::className(), ['id' => 'parentID']);
+    }
+
     ### functions
+
+    public function isAuthor($userID)
+    {
+        return $this->authorID == $userID;
+    }
 }

@@ -1,8 +1,14 @@
 <?php
 
+use app\models\Comment;
+use yii\bootstrap\ActiveForm;
+use yii\helpers\Html;
+use yii\widgets\Pjax;
+
 /**
- * @var \yii\web\View    $this
- * @var \app\models\Post $mPost
+ * @var \yii\web\View         $this
+ * @var \app\models\Post      $mPost
+ * @var \app\models\Comment[] $aComment
  */
 
 $this->params['breadcrumbs'][] = 'Post';
@@ -13,7 +19,6 @@ $this->params['breadcrumbs'][] = $mPost->title;
 
 <div class="row">
     <div class="col-md-10 col-md-offset-1">
-
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h1 class="panel-title"><?= $mPost->title; ?></h1>
@@ -32,64 +37,41 @@ $this->params['breadcrumbs'][] = $mPost->title;
 
             <div class="panel-body">
 
+                <?php Pjax::begin(['id' => 'some123']); ?>
+
                 <ul class="media-list" data-type="comment" data-id="123">
-                    <li class="media">
-                        <div class="media-left">
-                            <a href="#">
-                                <img class="media-object" src="http://placehold.it/50x50">
-                            </a>
-                        </div>
-
-                        <div class="media-body">
-                            <h4 class="media-heading">
-                                <div class="pull-right">
-                                    <a class="btn btn-xs btn-danger" href="/">Delete</a>
-                                    <a class="btn btn-xs btn-success " href="/">Comment</a>
-                                </div>
-
-                                <span>Media heading</span>
-                            </h4>
-                            <p>some generated text</p>
-
-                        </div>
-                    </li>
-
-                    <li class="media">
-                        <div class="media-left">
-                            <a href="#">
-                                <img class="media-object" src="http://placehold.it/50x50">
-                            </a>
-                        </div>
-
-                        <div class="media-body">
-                            <h4 class="media-heading">
-                                <div class="pull-right">
-                                    <a class="btn btn-xs btn-danger" href="/">Delete</a>
-                                    <a class="btn btn-xs btn-success " href="/">Comment</a>
-                                </div>
-
-                                <span>Media heading</span>
-                            </h4>
-                            <p>some generated text</p>
-                        </div>
-                    </li>
+                    <?php foreach ($aComment as $mComment) : ?>
+                        <?= $this->render('_comment', ['mComment' => $mComment, 'iParentID' => null]); ?>
+                    <?php endforeach; ?>
                 </ul>
 
                 <?php if (\Yii::$app->getUser()->getIsGuest()): ?>
-                    <a href="#" id="uLogin" data-ulogin="display=window;fields=first_name,last_name;callback=preview"><img src="https://ulogin.ru/img/button.png" width=187 height=30 alt="МультиВход"/></a>
+                    <a href="#" data-action="uLogin" id="<?= \Yii::$app->getSecurity()->generateRandomString(5); ?>"><img src="https://ulogin.ru/img/button.png" width="187" height="30" alt="МультиВход"/></a>
                 <?php else: ?>
-                    <p>comment form</p>
+                    <?php $oFormComment = ActiveForm::begin(['options' => ['data-pjax' => 1]]); ?>
+                    <?php $mComment = new Comment(); ?>
+
+                    <?= $oFormComment->field($mComment, 'content')->textarea(); ?>
+
+                    <?= Html::submitButton('Add', ['class' => 'btn btn-sm btn-primary center-block']); ?>
+                    <?php ActiveForm::end(); ?>
                 <?php endif; ?>
 
-
             </div>
+
+            <?php Pjax::end(); ?>
+
         </div>
 
     </div>
-
 </div>
 
 <script type="text/javascript">
+    //    $(document).on('custom1', function () {
+    //        alert('reload');
+    //    });
+    //    $(document).trigger('custom1');
+
     function preview(token) {
         $.getJSON("//ulogin.ru/token.php?host=" +
             encodeURIComponent(location.toString()) + "&token=" + token + "&callback=?",
@@ -104,10 +86,18 @@ $this->params['breadcrumbs'][] = $mPost->title;
                             data: data,
                             success: function (aData) {
                                 console.log(aData);
+
+                                if (aData.isAuth == 1) {
+                                    updateNavigation(aData.sNavigation);
+                                }
                             }
                         }
                     );
                 }
             });
     }
+
+    $(document).ready(function () {
+
+    });
 </script>

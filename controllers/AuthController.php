@@ -17,14 +17,13 @@ use yii\web\Controller;
  */
 class AuthController extends Controller
 {
+    public $layout = false;
     /**
      * @return string|\yii\web\Response
      */
     public function actionLogin()
     {
-        $aReturn = [
-            'error' => false
-        ];
+        $aReturn = ['isAuth' => 0];
 
         if (\Yii::$app->getRequest()->getIsAjax()) {
             try {
@@ -44,8 +43,10 @@ class AuthController extends Controller
 
                 \Yii::$app->getUser()->login(UserIdentity::findIdentity($mUser->id), 3600 * 24 * 30);
 
+                $aReturn['sNavigation'] = $this->render('//layouts/_navigation');
+                $aReturn['isAuth'] = 1;
             } catch (\Exception $oException) {
-                $aReturn['error'] = $oException->getMessage();
+                $aReturn['isAuth'] = 0;//$oException->getMessage();
             }
         }
 
@@ -80,7 +81,6 @@ class AuthController extends Controller
     {
         \Yii::$app->getUser()->logout();
 
-        return $this->goHome();
+        return Json::encode(['isAuth' => 0, 'sNavigation' => $this->render('//layouts/_navigation')]);
     }
-
 }

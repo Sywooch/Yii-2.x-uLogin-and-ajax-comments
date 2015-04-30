@@ -1,7 +1,6 @@
 <?php
+
 use yii\helpers\Html;
-use yii\bootstrap\Nav;
-use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
 
@@ -23,7 +22,37 @@ AppAsset::register($this);
         <?= Html::csrfMetaTags() ?>
         <title><?= Html::encode($this->title) ?></title>
         <?php $this->head() ?>
+
         <script src="//ulogin.ru/js/ulogin.js"></script>
+
+        <script type="text/javascript">
+            function updateNavigation(sNavigation) {
+                $('#navigation').replaceWith(sNavigation);
+                rebindULogin();
+            }
+
+            function rebindULogin() {
+                $('[data-action="uLogin"]').each(function () {
+                    $(this).removeAttr('data-action');
+                    $(this).attr('data-ulogin', 'display=window;fields=first_name,last_name;callback=preview');
+                    uLogin.customInit($(this).attr('id'));
+                });
+
+                $('[data-action="logout"]').unbind().click(function (oEvent) {
+                    oEvent.preventDefault();
+
+                    $.ajax({
+                        type: 'POST',
+                        dataType: 'json',
+                        url: '/auth/logout',
+                        success: function (aData) {
+                            updateNavigation(aData.sNavigation);
+                        }
+                    })
+                })
+            }
+
+        </script>
     </head>
 
     <body>
@@ -31,26 +60,7 @@ AppAsset::register($this);
     <?php $this->beginBody() ?>
 
     <div class="wrap">
-        <?php
-        NavBar::begin(['brandLabel' => 'Blog', 'brandUrl' => \Yii::$app->homeUrl, 'options' => ['class' => 'navbar-inverse navbar-fixed-top']]);
-
-        echo Nav::widget([
-            'options' => ['class' => 'navbar-nav navbar-right'],
-            'items' => [
-                ['label' => 'Posts', 'url' => ['/post']],
-                ['label' => 'About', 'url' => ['/about']],
-                \Yii::$app->getUser()->getIsGuest() ?
-                    ['label' => 'Login', 'url' => ['/auth/login']] :
-                    [
-                        'label' => 'Logout (' . \Yii::$app->getUser()->getIdentity()->username . ')',
-                        'url' => ['/auth/logout'],
-                        'linkOptions' => ['data-method' => 'post']
-                    ]
-            ]
-        ]);
-
-        NavBar::end();
-        ?>
+        <?= $this->render('_navigation'); ?>
 
         <div class="container">
             <?= Breadcrumbs::widget(['links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : []]) ?>
