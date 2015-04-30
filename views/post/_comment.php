@@ -8,6 +8,10 @@ use yii\helpers\Html;
  * @var \yii\web\View       $this
  * @var \app\models\Comment $mComment
  */
+
+$oUser = \Yii::$app->getUser();
+$mCommentChild = new Comment();
+
 ?>
 
 <li class="media">
@@ -20,36 +24,30 @@ use yii\helpers\Html;
     <div class="media-body">
         <h4 class="media-heading">
             <div class="pull-right">
-                <?php if ($mComment->isAuthor(\Yii::$app->getUser()->getID())): ?>
-
+                <?php if ($mComment->isAuthor($oUser->getID())): ?>
                     <?php $oFormDelete = ActiveForm::begin(['options' => ['data-pjax' => 1]]); ?>
                     <?= Html::hiddenInput('commentID', $mComment->id); ?>
                     <?= Html::submitButton('Delete', ['class' => 'btn btn-xs btn-danger']); ?>
                     <?php ActiveForm::end(); ?>
-
                 <?php endif; ?>
 
-                <?php if (!\Yii::$app->getUser()->getIsGuest()) : ?>
+                <?php if (!$oUser->isGuest && $mComment->canComment()) : ?>
                     <a class="btn btn-xs btn-success" onclick="toggleCommentDialog('<?= $mComment->id; ?>');return false;" href="/">Comment</a>
                 <?php endif; ?>
             </div>
 
-            <span><?= $mComment->id; ?> <?= $mComment->author->getName(); ?></span>
+            <span><?= $mComment->id; ?> <?= $mComment->author->getName(); ?> <small class="text-muted"><?= \Yii::$app->getFormatter()->asDatetime($mComment->timeCreate); ?></small></span>
         </h4>
+
         <p><?= $mComment->content; ?></p>
 
         <?php if ($mComment->childComments): ?>
-            <ul class="media-list" data-type="comment" data-id="123">
-                <?php foreach ($mComment->childComments as $mChildComment): ?>
-                    <?= $this->render('_comment', ['mComment' => $mChildComment, 'iParentID' => $mComment->id]); ?>
-                <?php endforeach; ?>
-            </ul>
+            <?= $this->render('_commentList', ['aComment' => $mComment->childComments]); ?>
         <?php endif; ?>
 
-        <?php if (!\Yii::$app->getUser()->getIsGuest()) : ?>
+        <?php if (!$oUser->isGuest && $mComment->canComment()) : ?>
             <div class="hidden" data-id="comment-<?= $mComment->id; ?>">
                 <?php $oForm = ActiveForm::begin(['options' => ['data-pjax' => 1]]); ?>
-                <?php $mCommentChild = new Comment(); ?>
 
                 <?= $oForm->field($mCommentChild, 'content')->textarea(); ?>
                 <?= $oForm->field($mCommentChild, 'parentID')->hiddenInput(['value' => $mComment->id])->label(false); ?>

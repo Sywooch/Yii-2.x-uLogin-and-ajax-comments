@@ -39,11 +39,7 @@ $this->params['breadcrumbs'][] = $mPost->title;
 
                 <?php Pjax::begin(['id' => 'comments']); ?>
 
-                <ul class="media-list" data-type="comment" data-id="123">
-                    <?php foreach ($aComment as $mComment) : ?>
-                        <?= $this->render('_comment', ['mComment' => $mComment, 'iParentID' => null]); ?>
-                    <?php endforeach; ?>
-                </ul>
+                <?= $this->render('_commentList', ['aComment' => $aComment]); ?>
 
                 <?php if (\Yii::$app->getUser()->getIsGuest()): ?>
                     <a href="#" data-action="uLogin" id="<?= \Yii::$app->getSecurity()->generateRandomString(5); ?>"><img src="https://ulogin.ru/img/button.png" width="187" height="30" alt="МультиВход"/></a>

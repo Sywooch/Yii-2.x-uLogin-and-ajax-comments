@@ -14,6 +14,8 @@ use app\models\_extend\AbstractActiveRecord;
  * @property int       $authorID
  * @property string    $content
  * @property int       $timeCreate
+ * @property int       $parentID
+ * @property int       $level
  *
  * @property Post      $post
  * @property User      $author
@@ -37,7 +39,8 @@ class Comment extends AbstractActiveRecord
     {
         return [
             ['parentID', 'safe'],
-            [['postID', 'authorID', 'content', 'timeCreate'], 'required']
+            [['postID', 'authorID', 'content', 'timeCreate'], 'required'],
+            ['content', 'string', 'min' => 1, 'max' => 100]
         ];
     }
 
@@ -68,6 +71,18 @@ class Comment extends AbstractActiveRecord
         }
 
         return parent::beforeDelete();
+    }
+
+    /**
+     * @return bool
+     */
+    public function beforeValidate()
+    {
+        if ($this->level === null) {
+            $this->level = $this->countLevel($this);
+        }
+
+        return parent::beforeValidate();
     }
 
     ### relations
@@ -109,5 +124,29 @@ class Comment extends AbstractActiveRecord
     public function isAuthor($userID)
     {
         return $this->authorID == $userID;
+    }
+
+    /**
+     * @param Comment $mComment
+     *
+     * @return int
+     */
+    private function countLevel(Comment $mComment)
+    {
+        $iLevel = 1;
+
+        if ($mComment->parentID) {
+            $iLevel += $this->countLevel($mComment->parentComment);
+        }
+
+        return $iLevel;
+    }
+
+    /**
+     * @return bool
+     */
+    public function canComment()
+    {
+        return ($this->level < 3);
     }
 }
