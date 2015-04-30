@@ -52,7 +52,6 @@ AppAsset::register($this);
                     })
                 })
             }
-
         </script>
     </head>
 
