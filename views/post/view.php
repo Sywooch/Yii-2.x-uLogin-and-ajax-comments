@@ -103,8 +103,11 @@ $this->params['breadcrumbs'][] = $mPost->title;
         $.ajax({
             type: 'POST',
             dataType: 'json',
-            data: {iLastCommentID: iCommentID},
-            url: '/post/get-comments',
+            data: {
+                action: 'showMore',
+                iLastCommentID: iCommentID
+            },
+            //url: '/post/get-comments',
             success: function (aData) {
                 console.log(oLi);
                 console.log(oLi.closest('ul.media-list'));

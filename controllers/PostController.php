@@ -56,6 +56,17 @@ class PostController extends Controller
                     $mComment->delete();
                 }
             }
+
+            if (\Yii::$app->getRequest()->post('action') == 'showMore'){
+                $this->layout = false;
+                $mComment = Comment::findOne([\Yii::$app->getRequest()->post('iLastCommentID')]);
+                /** @var Comment $mComment */
+
+                $aComment = $mComment->getNextComments();
+                $sHtml = ($mComment) ? $this->render('_commentsAjax', ['aComment' => $aComment]) : '';
+
+                return Json::encode(['sHtml' => $sHtml, 'count' => count($aComment)]);
+            }
         }
 
         $aComment = Comment::find()->where('postID = :postID && parentID IS NULL', ['postID' => $id])

@@ -172,9 +172,14 @@ class Comment extends AbstractActiveRecord
      */
     public function nextCommentsQuery()
     {
+        $oQuery = Comment::find()->where('timeCreate > :timeCreate', ['timeCreate' => $this->timeCreate])->orderBy('timeCreate ASC');
 
-        return Comment::find()
-            ->where('timeCreate > :timeCreate AND parentID = :parentID', ['timeCreate' => $this->timeCreate, 'parentID' => $this->parentID])
-            ->orderBy('timeCreate ASC');
+        if (is_null($this->parentID)) {
+            $oQuery->andWhere('parentID IS NULL');
+        } else {
+            $oQuery->andWhere('parentID = :parentID', ['parentID' => $this->parentID]);
+        }
+
+        return $oQuery;
     }
 }
